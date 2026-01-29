@@ -10,8 +10,9 @@ env:
 phases:
   install:
     runtime-versions:
-      python: 3.11
       docker: 24
+    commands:
+      - echo "Install phase completed"
 
   pre_build:
     commands:
@@ -21,10 +22,10 @@ phases:
   build:
     commands:
       - echo "Building Docker image..."
-      - docker build -t "$DOCKER_REGISTRY_URL/$DOCKER_REGISTRY_USERNAME/simple-python-flask-app:latest" day-13/simple-python-app
+      - docker build -t "$DOCKER_REGISTRY_URL/$DOCKER_REGISTRY_USERNAME/ci-cd-aws-app:latest" .
 
   post_build:
     commands:
       - echo "Pushing Docker image..."
-      - docker push "$DOCKER_REGISTRY_URL/$DOCKER_REGISTRY_USERNAME/simple-python-flask-app:latest"
+      - docker push "$DOCKER_REGISTRY_URL/$DOCKER_REGISTRY_USERNAME/ci-cd-aws-app:latest"
       - echo "Build completed successfully!"
