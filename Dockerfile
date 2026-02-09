@@ -1,20 +1,9 @@
-# Use lightweight Python image
-FROM python:3.11-slim
+FROM nginx:alpine
 
-# Set working directory
-WORKDIR /app
+RUN rm -rf /usr/share/nginx/html/*
 
-# Copy dependency file
-COPY requirements.txt .
+COPY . /usr/share/nginx/html/
 
-# Install dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+EXPOSE 80
 
-# Copy application code
-COPY . .
-
-# Expose Flask port
-EXPOSE 5000
-
-# Run app with Gunicorn
-CMD ["gunicorn", "-b", "0.0.0.0:5000", "app:app"]
+CMD ["nginx", "-g", "daemon off;"]
