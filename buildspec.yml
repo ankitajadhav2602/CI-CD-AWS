@@ -1,0 +1,28 @@
+version: 0.2
+
+env:
+  variables:
+    REPOSITORY_URI: public.ecr.aws/s2q8f2k8
+    AWS_DEFAULT_REGION: ap-south-1
+    ECR_REPO_NAME: ci-cd-repo
+    ECR_PUBLIC_AUTH_REGION: us-east-1
+
+phases:
+  pre_build:
+    commands:
+      - IMAGE_TAG=${CODEBUILD_RESOLVED_SOURCE_VERSION:-latest}
+      - echo "Login to ECR Public..."
+      - aws ecr-public get-login-password --region ${ECR_PUBLIC_AUTH_REGION} | docker login --username AWS --password-stdin public.ecr.aws
+
+  build:
+    commands:
+      - echo "Building..."
+      - docker build -t ${ECR_REPO_NAME}:${IMAGE_TAG} .
+      - docker tag ${ECR_REPO_NAME}:${IMAGE_TAG} ${REPOSITORY_URI}/${ECR_REPO_NAME}:${IMAGE_TAG}
+      - docker tag ${ECR_REPO_NAME}:${IMAGE_TAG} ${REPOSITORY_URI}/${ECR_REPO_NAME}:latest
+
+  post_build:
+    commands:
+      - echo "Pushing..."
+      - docker push ${REPOSITORY_URI}/${ECR_REPO_NAME}:${IMAGE_TAG}
+      - docker push ${REPOSITORY_URI}/${ECR_REPO_NAME}:latest
